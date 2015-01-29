@@ -1,3 +1,4 @@
+
 //
 //  AppDelegate.swift
 //  dummyDB
@@ -8,6 +9,8 @@
 
 import UIKit
 import CoreData
+import QueryKit
+
 
 @UIApplicationMain
 class AppDelegate: UIResponder, UIApplicationDelegate {
@@ -17,6 +20,48 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 
   func application(application: UIApplication, didFinishLaunchingWithOptions launchOptions: [NSObject: AnyObject]?) -> Bool {
     // Override point for customization after application launch.
+    
+    var moc = self.managedObjectContext!
+    
+    var bob = Person(managedObjectContext: moc)
+    bob.name = "Brown"
+    bob.firstname = "Bob"
+    bob.age = 42
+    
+    var ann = Person(managedObjectContext: moc)
+    ann.name = "Miller"
+    ann.firstname = "Ann"
+    ann.age = 32
+    
+    var jim = Person(managedObjectContext: moc)
+    jim.name = "Miller"
+    jim.firstname = "Jim"
+    jim.age = 42
+
+    var john = Person(managedObjectContext: moc)
+    john.name = "Smith"
+    john.firstname = "John"
+
+    
+    saveContext()
+
+    var predicate = NSPredicate(format: "age == 0")
+    var qs2 = Person.queryset(moc).filter(predicate!)
+    var result = qs2.delete()
+
+    println("Result")
+    println(result)
+    
+    for per in qs2 {
+      println("----")
+      println(per.description)
+      
+    }
+
+    
+    
+    
+    
     return true
   }
 
@@ -65,7 +110,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
       let url = self.applicationDocumentsDirectory.URLByAppendingPathComponent("dummyDB.sqlite")
       var error: NSError? = nil
       var failureReason = "There was an error creating or loading the application's saved data."
-      if coordinator!.addPersistentStoreWithType(NSSQLiteStoreType, configuration: nil, URL: url, options: nil, error: &error) == nil {
+      if coordinator!.addPersistentStoreWithType(NSInMemoryStoreType, configuration: nil, URL: nil, options: nil, error: &error) == nil {
           coordinator = nil
           // Report any error we got.
           let dict = NSMutableDictionary()
@@ -78,7 +123,6 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
           NSLog("Unresolved error \(error), \(error!.userInfo)")
           abort()
       }
-      
       return coordinator
   }()
 
